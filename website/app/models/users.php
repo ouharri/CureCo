@@ -3,10 +3,12 @@
 
 class users extends DB
 {
+    private bool|MysqliDb $con;
+
     public function __construct()
     {
         $this->table = 'users';
-        $this->connect();
+        $this->con = $this->connect();
     }
     /**
      * @throws Exception
@@ -17,9 +19,6 @@ class users extends DB
         $admin = $this->conn->where('password', $password);
         return $admin->getOne($this->table);
     }
-
-
-
 
     /**
      * @throws Exception
@@ -65,5 +64,26 @@ class users extends DB
     {
         $db = $this->conn->where('code',$code);
         return $db->update($this->table,$data);
+    }
+
+    public function setAdmin($id){
+        $db = $this->conn->where('id',$id);
+        return $db->update($this->table,['is_admin' => true]);
+    }
+
+    public function setClient($id){
+        $db = $this->conn->where('id',$id);
+        return $db->update($this->table,['is_admin' => false]);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getRecent(): array|string
+    {
+        return $this->con->rawquery("SELECT " . " * 
+                                           FROM 
+                                                {$this->table} 
+                                           ORDER BY id LIMIT 8;");
     }
 }

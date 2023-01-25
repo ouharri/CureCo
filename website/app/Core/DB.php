@@ -37,6 +37,11 @@ class DB
         return $db->delete($this->table);
     }
 
+    public function getAll()
+    {
+        return  $this->conn->get($this->table);
+    }
+
     /**
      * @throws Exception
      */
@@ -54,6 +59,4 @@ class DB
         $db = $this->db->where('id', $id);
         return $db->update($this->table, $data);
     }
-
-
 }

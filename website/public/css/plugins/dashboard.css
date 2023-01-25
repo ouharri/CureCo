@@ -5508,8 +5508,8 @@ fieldset:disabled .btn {
   padding-right: var(--bs-breadcrumb-item-padding-x);
   color: var(--bs-breadcrumb-divider-color);
   content: var(--bs-breadcrumb-divider, "/")
-    /* rtl: var(--bs-breadcrumb-divider, "/") */
-  ;
+  /* rtl: var(--bs-breadcrumb-divider, "/") */
+;
 }
 
 .breadcrumb-item.active {
@@ -7254,8 +7254,8 @@ fieldset:disabled .btn {
 @keyframes spinner-border {
   to {
     transform: rotate(360deg)
-      /* rtl:ignore */
-    ;
+    /* rtl:ignore */
+  ;
   }
 }
 

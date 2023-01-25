@@ -28,6 +28,15 @@ class LoginController
             $password = md5(validateData::validate_data($_POST['password']));
             if ($db->getUser($email, $password)) {
                 $data['user'] = $db->getUser($email, $password);
+                $imgdata = $data['user']['img'];
+                $f = finfo_open();
+                $mime_type = finfo_buffer($f, $imgdata, FILEINFO_MIME_TYPE);
+                if ($mime_type != 'text/plain') {
+                    $imgdata = "data:{$mime_type};charset=utf8;base64," . base64_encode($data['user']['img']) . '"';
+                } else {
+                    $imgdata = "data:image/svg+xml;utf8," . addslashes(htmlentities(base64_decode($data['user']['img']))) . '"';
+                }
+                $_SESSION['user']['img_u'] = $imgdata;
                 $_SESSION['user']['id_u'] = $data['user']['id'];
                 $_SESSION['user']['firstName_u'] = $data['user']['FirstName'];
                 $_SESSION['user']['lastName_u'] = $data['user']['lastName'];

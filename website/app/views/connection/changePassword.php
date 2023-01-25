@@ -38,7 +38,7 @@
                 <!--                </div>-->
                 <div class="w3l_form align-self">
                     <div class="left_grid_info">
-                        <img src="images/image3.svg" alt="">
+                        <img src="<?= url('images/connection/image4.svg')?>" alt="">
                     </div>
                 </div>
                 <div class="content-wthree">

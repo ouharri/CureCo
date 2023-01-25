@@ -15,7 +15,7 @@ class validateData
         //Escapes special characters in a string for use in an SQL statement
         $data = mysqli_real_escape_string($conn, $data);
         // Check for common SQL injection attack patterns
-        $injection_patterns = array("--", ";", "\"", "'", " or ", " and ", " union ", " select ", " update ", " delete ");
+        $injection_patterns = array("--", ";", "\"", "'", " drop ", " union ", " select ", " update ", " delete ");
         foreach ($injection_patterns as $pattern) {
             if (stripos($data, $pattern) !== false) {
                 die("Invalid input");

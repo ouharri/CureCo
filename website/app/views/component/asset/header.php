@@ -15,8 +15,12 @@
 
 <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet' type="text/css" media="all"/>
 
-<script src="<?= url('js/plugins/sweetalert2.min.js') . '?v=' . time() ?>"></script>
-
 <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
 <script src="https://kit.fontawesome.com/3d582d9974.js" crossorigin="anonymous"></script>
+
+<script src="<?= url('js/plugins/sweetalert2.min.js') . '?v=' . time() ?>"></script>
+
+<script src="https://kit.fontawesome.com/af562a2a63.js" crossorigin="anonymous"></script>
+
+<link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">

@@ -20,15 +20,20 @@
         <ul>
             <li>
                 <a href="#">
-                        <span class="icon">
-                            <ion-icon name="logo-apple"></ion-icon>
+                        <span class="icon" style="color: rgba(2,100,52,0.69) !important;">
+                            <ion-icon name="medical-outline"></ion-icon>
+                            <img src="https://cdn.discordapp.com/attachments/1026552757135605851/1067480189803708526/favicon_Cureco.png"
+                                 style="position: absolute; top: 50px;opacity: .5;">
                         </span>
-                    <span class="title">Brand Name</span>
+                    <span class="title text-3xl">
+                        Cure
+                        <span style="color: rgba(2,100,52,0.69) !important;">Co</span>
+                    </span>
                 </a>
             </li>
 
-            <li>
-                <a href="#">
+            <li id="home">
+                <a href="<?= url('dashboard') ?>">
                         <span class="icon">
                             <ion-icon name="home-outline"></ion-icon>
                         </span>
@@ -36,26 +41,83 @@
                 </a>
             </li>
 
-            <li>
+            <li id="table" class="">
+                <a href="javascript:;">
+                        <span class="icon">
+                            <ion-icon name="calendar-outline"></ion-icon>
+                        </span>
+                    <span class="title">Tables</span>
+                </a>
+            </li>
+            <div id="tableShow" class="d-none m-0 p-0 boxShow">
+                <li class="m-0 p-0"></li>
+                <li class="m-0 p-0">
+                    <a href="<?= url('dashboard/category') ?>" class="mx-4 border-radius-2xl box cursor-pointer">
+                        <span class="icon">
+                            <ion-icon name="apps-outline"></ion-icon>
+                        </span>
+                        <span class="title">Category</span>
+                    </a>
+                </li>
+                <li class="m-0">
+                    <a href="<?= url('dashboard/product') ?>" class="mx-4 border-radius-2xl box cursor-pointer">
+                        <span class="icon">
+                            <ion-icon name="pricetags-outline"></ion-icon>
+                        </span>
+                        <span class="title">Product</span>
+                    </a>
+                </li>
+            </div>
+
+
+            <li id="add">
                 <a href="#">
+                        <span class="icon">
+                            <ion-icon name="add-outline"></ion-icon>
+                        </span>
+                    <span class="title">Add</span>
+                </a>
+            </li>
+            <div id="addShow" class="d-none boxShow">
+                <li class="m-0 p-0"></li>
+                <li class="m-0">
+                    <a href="<?= url('dashboard/addcategory') ?>" class="mx-4 border-radius-2xl box cursor-pointer">
+                        <span class="icon">
+                            <ion-icon name="apps-outline"></ion-icon>
+                        </span>
+                        <span class="title">Category</span>
+                    </a>
+                </li>
+                <li class="m-">
+                    <a href="<?= url('dashboard/addproduct') ?>" class="mx-4 border-radius-2xl box cursor-pointer">
+                        <span class="icon">
+                            <ion-icon name="pricetags-outline"></ion-icon>
+                        </span>
+                        <span class="title">Product</span>
+                    </a>
+                </li>
+            </div>
+
+            <li id="Customers">
+                <a href="<?=url('dashboard/users')?>">
                         <span class="icon">
                             <ion-icon name="people-outline"></ion-icon>
                         </span>
-                    <span class="title">Customers</span>
+                    <span class="title">Users</span>
                 </a>
             </li>
 
             <li>
-                <a href="#">
+                <a href="javascript:;" onclick="printTicket()">
                         <span class="icon">
-                            <ion-icon name="chatbubble-outline"></ion-icon>
+                            <ion-icon name="print-outline"></ion-icon>
                         </span>
-                    <span class="title">Messages</span>
+                    <span class="title">Print</span>
                 </a>
             </li>
 
             <li>
-                <a href="#">
+                <a href="<?=url('dashboard/help')?>">
                         <span class="icon">
                             <ion-icon name="help-outline"></ion-icon>
                         </span>
@@ -63,26 +125,26 @@
                 </a>
             </li>
 
-            <li>
-                <a href="#">
-                        <span class="icon">
-                            <ion-icon name="settings-outline"></ion-icon>
-                        </span>
-                    <span class="title">Settings</span>
-                </a>
-            </li>
+<!--            <li>-->
+<!--                <a href="#">-->
+<!--                        <span class="icon">-->
+<!--                            <ion-icon name="settings-outline"></ion-icon>-->
+<!--                        </span>-->
+<!--                    <span class="title">Settings</span>-->
+<!--                </a>-->
+<!--            </li>-->
+
+<!--            <li>-->
+<!--                <a href="#">-->
+<!--                        <span class="icon">-->
+<!--                            <ion-icon name="lock-closed-outline"></ion-icon>-->
+<!--                        </span>-->
+<!--                    <span class="title">Password</span>-->
+<!--                </a>-->
+<!--            </li>-->
 
             <li>
-                <a href="#">
-                        <span class="icon">
-                            <ion-icon name="lock-closed-outline"></ion-icon>
-                        </span>
-                    <span class="title">Password</span>
-                </a>
-            </li>
-
-            <li>
-                <a href="#">
+                <a href="<?=url('logout')?>">
                         <span class="icon">
                             <ion-icon name="log-out-outline"></ion-icon>
                         </span>
@@ -91,4 +153,25 @@
             </li>
         </ul>
     </div>
+
+    <div class="main">
+        <div class="topbar">
+            <div class="toggle">
+                <ion-icon name="menu-outline"></ion-icon>
+            </div>
+
+            <div class="search mt-2">
+                <label>
+                    <input type="text" placeholder="Search here" id="seachBox">
+                    <ion-icon name="search-outline"></ion-icon>
+                </label>
+            </div>
+
+            <div class="img__wrap gap-2">
+                <div class="user">
+                    <img src="<?= $_SESSION['user']['img_u'] ?>" alt="">
+                </div>
+                <div class="img__description"><?= $_SESSION['user']['firstName_u'] . ' ' . $_SESSION['user']['lastName_u'] ?></div>
+            </div>
+        </div>
 

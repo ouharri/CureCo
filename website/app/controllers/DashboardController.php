@@ -1,31 +1,71 @@
 <?php
 
 use JetBrains\PhpStorm\NoReturn;
+use Mpdf\MpdfException;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
 
 class DashboardController
 {
-    /**
-     * @throws Exception
-     */
-    public function index()
+    protected mixed $PreviewUrl;
+
+    public function __construct()
     {
-        View::load('dashboard/home');
+        redirect::admin();
+        $this->PreviewUrl = $_SERVER['HTTP_REFERER'] ?? url();
     }
 
     /**
-     * @throws Exception
+     * @throws Exception|\Exception
+     */
+    public function index(): void
+    {
+        $data = [];
+        $products = new product();
+        $users = new users();
+        $data['products'] = $products->getRecent();
+        $data['users'] = $users->getRecent();
+        $data['total'] = $products->getTotal();
+        $data['max'] = $products->getMax();
+        $data['min'] = $products->getMin();
+        $data['avg'] = round($products->getavg(), 2);
+        for ($i = 0; $i < count($data['users']); $i++) {
+            $imgdata = $data['users'][$i]['img'];
+            $f = finfo_open();
+            $mime_type = finfo_buffer($f, $imgdata, FILEINFO_MIME_TYPE);
+            if ($mime_type != 'text/plain') {
+                $data['users'][$i]['img'] = "data:{$mime_type};charset=utf8;base64," . base64_encode($data['users'][$i]['img']) . '"';
+            } else {
+                $data['users'][$i]['img'] = "data:image/svg+xml;utf8," . addslashes(htmlentities(base64_decode($data['users'][$i]['img']))) . '"';
+            }
+        }
+        View::load('dashboard/home', $data);
+    }
+
+    /**
+     */
+    public function category(): void
+    {
+        $category = new Category();
+        $data['category'] = $category->getAll();
+        view::load('dashboard/category', $data);
+    }
+
+    /**
+     * @throws Exception|\Exception
      */
     public function addCategory(): void
     {
-        $typeProduct = new category();
-        if (isset($_POST['submit'])) {
+        $category = new category();
+        if (isset($_POST['submitBtn'])) {
             extract($_POST);
             for ($i = 0; $i < count($_POST['productType']); $i++) {
                 $data = array(
                     'libel' => $_POST['productType'][$i],
                     'desc' => $_POST['desc'][$i]
                 );
-                $typeProduct->insert($data);
+                $category->insert($data);
             }
             notif::add('product Type added successfully', 'success');
             redirect('dashboard');
@@ -35,7 +75,7 @@ class DashboardController
     }
 
     /**
-     * @throws Exception
+     * @throws Exception|\Exception
      */
     public function editCategory($id = 0): void
     {
@@ -47,12 +87,12 @@ class DashboardController
                 'libel' => $_POST['category'],
                 'desc' => $_POST['desc']
             );
-            if($typeProduct->update($id, $data)) {
+            if ($typeProduct->update($id, $data)) {
                 notif::add('category edited successfully', 'success');
-            }else{
+            } else {
                 notif::add('error in edit category', 'error');
             }
-            redirect('dashboard');
+            redirect('dashboard/category');
             exit();
         } else if ($id != 0) {
             $tmp = $typeProduct->getRow($id);
@@ -64,7 +104,7 @@ class DashboardController
     }
 
     /**
-     * @throws Exception
+     * @throws Exception|\Exception
      */
     #[NoReturn] public function deletCategory($id): void
     {
@@ -72,177 +112,360 @@ class DashboardController
         if ($category->delete($id)) {
             notif::add('category deleted successfully');
         } else {
-            notif::add('error in deleted category','error');
+            notif::add('error in deleted category', 'error');
         }
         redirect('dashboard');
         exit();
     }
 
+
+    /**
+     * @throws Exception|\Exception
+     */
+    public function product(): void
+    {
+        $product = new product();
+        $category = new category();
+        $data['products'] = $product->getAll();
+        for ($i = 0; $i < count($data['products']); $i++) {
+            $data['products'][$i]['category'] = $category->getRow($data['products'][$i]['category'])['libel'];
+        }
+        view::load('dashboard/product', $data);
+    }
+
+    /**
+     * @throws Exception|\Exception
+     */
     public function addProduct(): void
     {
-        $Product = new Product();
-        if (isset($_POST['submit'])) {
+        $data = [];
+        $product = new product();
+        if (isset($_POST['Libel'])) {
+            $flag = true;
+//            debug($_POST);
             extract($_POST);
-            for ($i = 0; $i < count($_POST['productType']); $i++) {
+            for ($i = 0; $i < count($_POST['Libel']); $i++) {
                 $data = array(
-                    'libel' => $_POST['productType'][$i],
-                    'desc' => $_POST['desc'][$i]
+                    'category' => (int)validateData::validate_data($_POST['category'][$i]),
+                    'libel' => validateData::validate_data($_POST['Libel'][$i]),
+                    'qnt' => validateData::validate_data($_POST['qty'][$i]),
+                    'price' => validateData::validate_data($_POST['price'][$i]),
+                    'img' => file_get_contents($_FILES['image']['tmp_name'][$i]),
+                    'desc' => validateData::validate_data($_POST['desc'][$i]),
+                    'codeBar' => validateData::validate_data($_POST['barCode'][$i]),
+                    'expirationDate' => validateData::validate_data($_POST['expirationDate'][$i]),
+                    'company' => validateData::validate_data($_POST['company'][$i])
                 );
-                $typeProduct->insert($data);
+                if (!$product->insert($data)) $flag = false;
             }
-            notif::add('product Type added successfully', 'success');
-        }
-        redirect('dashboard');
-    }
-
-
-
-    public function deletCruises($id)
-    {
-        $db = new Croisiere();
-        if ($db->delete($id)) {
-            $data['success'] = "Product deleted successfully";
-            redirect('dashboard');
+            if ($flag) {
+                notif::add('product added successfully', 'success');
+            } else {
+                notif::add('Something wrong went.', 'error');
+            }
+            redirect('dashboard/addproduct');
+            exit();
         } else {
-            echo "Error";
+            $category = new category();
+            $data['category'] = $category->getAll();
         }
+        view::load('dashboard/addProduct', $data);
     }
 
-    public function addNavire()
+    /**
+     * @throws Exception|\Exception
+     */
+    public function editProduct($id = 0): void
     {
         $data = [];
-        if (isset($_POST['submit'])) {
+        $product = new product();
+        if (isset($_POST['Libel'])) {
             extract($_POST);
             $data = array(
-                'libelle' => $navirName,
-                'numberOfRom' => $nbrrom,
-                'numberOfPlaces' => $nbrprsn,
+                'category' => (int)validateData::validate_data($_POST['category']),
+                'libel' => validateData::validate_data($_POST['Libel']),
+                'qnt' => validateData::validate_data($_POST['qty']),
+                'price' => validateData::validate_data($_POST['price']),
+                'desc' => validateData::validate_data($_POST['desc']),
+                'codeBar' => validateData::validate_data($_POST['barCode']),
+                'expirationDate' => validateData::validate_data($_POST['expirationDate']),
+                'company' => validateData::validate_data($_POST['company'])
             );
-            $db = new Navire();
-            if ($db->insert($data)) {
-                $data['success'] = "Navir added successfully";
+            if (!empty($_FILES['image']['tmp_name'])) $data = array_merge($data, ['img' => file_get_contents($_FILES['image']['tmp_name'])]);
+            if ($product->update($id, $data)) {
+                notif::add('product edited successfully', 'success');
             } else {
-                $data['error'] = "Error ";
+                notif::add('error in edit product', 'error');
+            }
+            redirect('dashboard/product');
+            exit();
+        } else if ($id != 0) {
+            $category = new category();
+            $data['category'] = $category->getAll();
+            $data['product'] = $product->getRow($id);
+            $data['product']['category'] = $category->getRow($data['product']['category'])['libel'];
+        }
+        view::load('dashboard/editProduct', $data);
+    }
+
+    /**
+     * @throws Exception|\Exception
+     */
+    #[NoReturn] public function deletproduct($id): void
+    {
+        $product = new product();
+        if ($product->delete($id)) {
+            notif::add('product deleted successfully');
+        } else {
+            notif::add('error in deleted product', 'error');
+        }
+        redirect('dashboard/product');
+        exit();
+    }
+
+    /**
+     * @throws Exception|\Exception
+     */
+    public function SortProduct($by, $order): void
+    {
+        if ($_POST['send']) {
+            $product = new product();
+            $category = new category();
+            $data = $product->SortBy($by, $order, $_POST['value']);
+            for ($i = 0; $i < count($data); $i++) {
+                $data[$i]['category'] = $category->getRow($data[$i]['category'])['libel'];
+                $data[$i]['img'] = "data:image/jpg;charset=utf8;base64," . base64_encode($data[$i]['img']);
+            }
+            header('Content-Type: application/json');
+            echo json_encode($data);
+        } else {
+//            rederict 404
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function search(): void
+    {
+        if ($_POST['send']) {
+            $key = $_POST['value'];
+            $product = new product();
+            $category = new category();
+            $data = $product->search($key);
+            for ($i = 0; $i < count($data); $i++) {
+                $data[$i]['category'] = $category->getRow($data[$i]['category'])['libel'];
+                $data[$i]['img'] = "data:image/jpg;charset=utf8;base64," . base64_encode($data[$i]['img']);
+            }
+            header('Content-Type: application/json');
+            echo json_encode($data);
+        } else {
+//            rederict 404
+        }
+    }
+
+
+    public function users(): void
+    {
+        $users = new users();
+        $data['users'] = $users->getAll();
+        for ($i = 0; $i < count($data['users']); $i++) {
+            $imgdata = $data['users'][$i]['img'];
+            $f = finfo_open();
+            $mime_type = finfo_buffer($f, $imgdata, FILEINFO_MIME_TYPE);
+            if ($mime_type != 'text/plain') {
+                $data['users'][$i]['img'] = "data:{$mime_type};charset=utf8;base64," . base64_encode($data['users'][$i]['img']) . '"';
+            } else {
+                $data['users'][$i]['img'] = "data:image/svg+xml;utf8," . addslashes(htmlentities(base64_decode($data['users'][$i]['img']))) . '"';
             }
         }
-
-        View::load('dashboard/addNavire', $data);
+        view::load('dashboard/users', $data);
     }
 
-    public function deletNavire($id)
+    /**
+     * @throws Exception|\Exception
+     */
+    #[NoReturn] public function editUsers($id)
     {
-        $db = new Navire();
-        if ($db->delete($id)) {
-            $data['success'] = "Navire deleted successfully";
-            redirect('dashboard');
-        } else {
-            echo "Error";
-        }
-    }
-
-
-    public function addPort()
-    {
-        if (isset($_POST['submit'])) {
-            extract($_POST);
-            $data = array(
-                'name' => $portName,
-                'countrie' => $countrie,
-            );
-            $db = new Port();
-            if ($db->insert($data)) {
-                $data['success'] = "Product added successfully";
-                $data['port'] = $db->getAllPort();
+        $users = new users();
+        if ($users->getRow($id)['is_admin']) {
+            if ($users->setClient($id)) {
+                notif::add('user edited successfully');
+                if ($id == $_SESSION['user']['id_u']) {
+                    $log = new logoutController();
+                    $log->index();
+                }
             } else {
-                $data['error'] = "Error ";
+                notif::add('error in edited user', 'error');
+            }
+        } else {
+            if ($users->setAdmin($id)) {
+                notif::add('user edited successfully');
+            } else {
+                notif::add('error in edited user', 'error');
             }
         }
-
-        $countrie = new countries();
-        $data['countrie'] = $countrie->getAllCountries();
-        View::load('dashboard/addPort', $data);
+        redirect('dashboard/users');
+        exit();
     }
 
-    public function deletPort($id)
+    /**
+     * @throws Exception|\Exception
+     */
+    #[NoReturn] public function deletUser($id): void
     {
-        $db = new Port();
-        if ($db->delete($id)) {
-            $data['success'] = "Port deleted successfully";
-            redirect('dashboard');
+        $users = new users();
+        if ($users->delete($id)) {
+            notif::add('product deleted successfully');
         } else {
-            echo "Error";
+            notif::add('error in deleted product', 'error');
         }
+        redirect('dashboard/users');
+        exit();
     }
 
-
-    public function addRom()
+    public function help(): void
     {
-        if (isset($_POST['submit'])) {
-            extract($_POST);
-            $data = array(
-                'typeRom' => $RomType,
-                'navire' => $Navire,
-                'numberOfRom' => $nbrRom,
-                'capacity' => $capacity,
-            );
-            $db = new Rom();
-            if ($db->insert($data)) {
-                $data['success'] = "Product added successfully";
+        if (isset($_POST['send'])) {
+            $mail = new PHPMailer(true);
+            $email = "ouharrioutman@gmail.com";
+            echo "<div style='display: none;'>";
+            {
+                $flag = true;
+                try {
+                    //Server settings
+                    $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
+                    $mail->isSMTP();                                            //Send using SMTP
+                    $mail->Host = 'smtp.gmail.com';                     //Set the SMTP server to send through
+                    $mail->SMTPAuth = true;                                   //Enable SMTP authentication
+                    $mail->Username = 'atman.atharri@gmail.com';                     //SMTP username
+                    $mail->Password = 'jbpdcdxbpzmsfmzn';                               //SMTP password
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
+                    $mail->Port = 465;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+                    //Recipients
+                    $mail->setFrom('atman.atharri@gmail.com');
+                    $mail->addAddress($email);
+                    //Content
+                    $mail->isHTML(true);                                  //Set email format to HTML
+                    $mail->Subject = 'from ' . $_SESSION['user']['email_u'];
+                    $mail->Body = $_POST['mail'];
+                    $mail->send();
+                    echo 'Message has been sent';
+                } catch (Exception $e) {
+                    $flag = false;
+                    echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+                }
+            }
+            echo "</div>";
+            if ($flag) {
+                notif::add('We\'ve send a verification link on your email address.');
             } else {
-                $data['error'] = "Error ";
+                notif::add('We Dont send a verification link ! (Something wrong went).', 'error');
             }
         }
-
-        $RomType = new TypeRom();
-        $Navire = new Navire();
-        $data['RomType'] = $RomType->getAllTypeRom();
-        $data['Navire'] = $Navire->getAllNavire();
-
-        View::load('dashboard/addRom', $data);
+        view::load('dashboard/help');
     }
 
-    public function deletRom($id)
+    /**
+     * @throws MpdfException
+     */
+    public function receiptPdf(): void
     {
-        $db = new Rom();
-        if ($db->delete($id)) {
-            $data['success'] = "Rom deleted successfully";
-            redirect('dashboard');
-        } else {
-            echo "Error";
+        $mpdf = new \Mpdf\Mpdf([
+            'default_font_size' => 8,
+            'margin_left' => 15,
+            'margin_right' => 15,
+            'margin_top' => 0,
+            'margin_bottom' => 0,
+            'margin_header' => 0,
+            'margin_footer' => 0,
+        ]);
+        $prod = '';
+        $products = new Product();
+        $category = new Category();
+        $date = date('Y-m-d');
+        $productCnt = $products->getAll();
+        $mail = $_SESSION['user']['email_u'];
+        $user = $_SESSION['user']['firstName_u'] . ' ' . $_SESSION['user']['lastName_u'];
+        for ($i = 0; $i < count($productCnt); $i++) {
+            $productCnt[$i]['category'] = $category->getRow($productCnt[$i]['category'])['libel'];
+            $prod .= <<<PRODUCT
+            <tr>
+                <td class="no" style="width: 5px;"></td>
+                <td class="desc"><h3>{$productCnt[$i]['libel']}</h3></td>
+                <td class="unit">{$productCnt[$i]['category']}</td>
+                <td class="qty">{$productCnt[$i]['qnt']}</td>
+                <td class="qty">{$productCnt[$i]['codeBar']}</td>
+                <td class="qty">{$productCnt[$i]['expirationDate']}</td>
+                <td class="total">{$productCnt[$i]['price']} DH</td>
+            </tr>
+            PRODUCT;
         }
+        $stylesheet = file_get_contents(url('css/print.css'));
+        $mpdf->WriteHTML($stylesheet, \Mpdf\HTMLParserMode::HEADER_CSS);
+        $received = <<<HTML
+        <html lang="en">
+            <body style="padding: 20px">
+                <header class="clearfix" style="margin-bottom: 15px;padding-bottom: 10px">
+                    <div id="logo" style="float: left;text-align: left;padding-top: 20px">
+                        <img src="https://cdn.discordapp.com/attachments/1026552757135605851/1067480189803708526/favicon_Cureco.png" width="50px" height="50px" alt="">
+                    </div>
+                    <div id="company" style="float: left;text-align: right">
+                        <h2 class="name">
+                            <span class="title text-3xl">
+                                Cure
+                                <span style="color: rgba(2,100,52,0.69) !important;">Co</span>
+                            </span>
+                        </h2>
+                        <div>455 west Lb7er, SE-rver AZ 85004, MA</div>
+                        <div>(+212) 6311-98914</div>
+                        <div><a href="mailto:ouharrioutman@gmail.com">ouharrioutman@gmail.com</a></div>
+                    </div>
+                </header>
+                <main>
+                    <div id="details" class="clearfix">
+                        <div id="client">
+                            <div class="to">INVOICE TO:</div>
+                            <h2 class="name">{$user}</h2>
+                            <div class="address">796 Silver Harbour, TX 79273, US</div>
+                            <div class="email"><a href="mailto:ouharrioutman@gmail.com">{$mail}</a></div>
+                        </div>
+                        <div id="invoice">
+                            <h1 style="color: rgb(123, 188, 209)">Print - 7678 -</h1>
+                            <div class="date">Date of Invoice: {$date}</div>
+                        </div>
+                    </div>
+                    <table border="0" cellspacing="0" cellpadding="0">
+                        <thead>
+                        <tr>
+                            <th class="no" style="width: 5px;"></th>
+                            <th class="desc">LIBEL</th>
+                            <th class="unit">CATEGORY</th>
+                            <th class="qty">QUANTITY</th>
+                            <th class="qty">CODEBAR</th>
+                            <th class="qty">EXPIRATIONDATE</th>
+                            <th class="total">Price</th>
+                        </tr>
+                        </thead>
+                        <tbody> 
+                            {$prod}
+                        </tbody>    
+                    </table>
+                    <div id="thanks" style="padding-top: 20px">Thank you!</div>
+                    <div id="notices">
+                        <div>NOTICE:</div>
+                        <div class="notice">
+                            you can cancel your reservation provided that the date is less than the departure date of the cruise!.
+                        </div>
+                    </div>
+                </main>
+                <footer>
+                    Invoice was created on a computer and is valid without the signature and seal.
+                </footer>
+            </body>
+        </html>
+        HTML;
+        $mpdf->WriteHTML($received, \Mpdf\HTMLParserMode::HTML_BODY);
+        $mpdf->Output('product.pdf', 'D');
     }
-
-    public function addTypeRom()
-    {
-        $data = [];
-        if (isset($_POST['submit'])) {
-            extract($_POST);
-            $data = array(
-                'libelle' => $romName,
-                'price' => $priceRom,
-                'min' => $minprsn,
-                'max' => $maxprsn,
-            );
-            $db = new TypeRom();
-            if ($db->insert($data)) {
-                $data['success'] = "Rom Type added successfully";
-            } else {
-                $data['error'] = "Error in adding Rom Type";
-            }
-        }
-        View::load('dashboard/addtyperom', $data);
-    }
-
-    public function deletTypeRom($id)
-    {
-        $db = new TypeRom();
-        if ($db->delete($id)) {
-            $data['success'] = "Rom deleted successfully";
-            redirect('dashboard');
-        } else {
-            echo "Error";
-        }
-    }
-
-
 }
