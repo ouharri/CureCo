@@ -1,5 +1,4 @@
 <!-- JavaScript -->
-<script src="<?= url('js/main.js') . '?v=' . time() ?>"></script>
 
 <script src="<?= url('js/plugins/jquery-3.4.1.min.js.js') . '?v=' . time() ?>"></script>
 
@@ -8,7 +7,7 @@
 <script src="<?= url('js/plugins/swiper-bundle.min.js') . '?v=' . time() ?>"></script>
 
 <!-- sweetalert -->
-<script src="<?= url('js/plugins/sweetalert2.min.js') . '?v=' . time() ?>"></script>
+<script src="<?= url('js/plugins/sweetalert2.all.min.js') . '?v=' . time() ?>"></script>
 
 <script src="<?= url('js/index.js') . '?v=' . time() ?>"></script>
 

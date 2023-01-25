@@ -59,7 +59,7 @@ class product extends DB
     /**
      * @throws Exception
      */
-    public function getMax(): array|string
+    public function getMax()
     {
         return $this->con->rawquery("SELECT " . " max(price) as max
                                            FROM 
@@ -69,7 +69,7 @@ class product extends DB
     /**
      * @throws Exception
      */
-    public function getMin(): array|string
+    public function getMin()
     {
         return $this->con->rawquery("SELECT " . " min(price) as min
                                            FROM 
@@ -79,7 +79,7 @@ class product extends DB
     /**
      * @throws Exception
      */
-    public function getAvg(): array|string
+    public function getAvg()
     {
         return $this->con->rawquery("SELECT " . " AVG(price) as avg
                                            FROM 

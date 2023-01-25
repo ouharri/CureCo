@@ -5,7 +5,7 @@ class validateData
     public static function validate_data($data)
     {
         //connect to db
-        $conn = mysqli_connect(HOST, USER, PASS, "login");
+        $conn = mysqli_connect(HOST, USER, PASS, DBNAME);
         // Remove whitespace from the beginning and end of the input
         $data = trim($data);
         // Remove any HTML or PHP tags from the input

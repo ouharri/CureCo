@@ -38,7 +38,7 @@ class LoginController
                 }
                 $_SESSION['user']['img_u'] = $imgdata;
                 $_SESSION['user']['id_u'] = $data['user']['id'];
-                $_SESSION['user']['firstName_u'] = $data['user']['FirstName'];
+                $_SESSION['user']['firstName_u'] = $data['user']['firstName'];
                 $_SESSION['user']['lastName_u'] = $data['user']['lastName'];
                 $_SESSION['user']['email_u'] = $data['user']['email'];
                 $_SESSION['user']['isAdmin'] = $data['user']['is_admin'];

@@ -491,7 +491,7 @@ body::-webkit-scrollbar-thumb {
 
 .details .recentOrders {
     position: relative;
-    display: grid;
+    /*display: grid;*/
     min-height: 500px;
     background: var(--white);
     padding: 20px;

@@ -1,5 +1,4 @@
 <?php include_once VIEWS . 'component' . DS . 'admin' . DS . 'header.php'; ?>
-
     <div class="d-flex flex-column justify-content-center align-content-center"
          style="min-height: calc(100vh - 60px );">
         <div class="container-fluid py-4">
@@ -54,7 +53,7 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <p class="text-xs font-weight-bold mb-0 text-center"><?= $u['FirstName'] ?></p>
+                                                    <p class="text-xs font-weight-bold mb-0 text-center"><?= $u['firstName'] ?></p>
                                                 </td>
                                                 <td>
                                                     <p class="text-xs font-weight-bold mb-0 text-center"><?= $u['lastName'] ?></p>
@@ -102,5 +101,4 @@
             </div>
         </div>
     </div>
-
 <?php include_once VIEWS . 'component' . DS . 'admin' . DS . 'footer.php'; ?>

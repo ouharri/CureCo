@@ -93,7 +93,7 @@
                             <div class="imgBx"><img src="<?=$u['img']?>" alt=""></div>
                         </td>
                         <td>
-                            <h4> <?=$u['FirstName']?> <?=$u['lastName']?><br> <span> <?=$u['email']?> </span></h4>
+                            <h4> <?=$u['firstName']?> <?=$u['lastName']?><br> <span> <?=$u['email']?> </span></h4>
                         </td>
                     </tr>
                 <?php endforeach;
