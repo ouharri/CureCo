@@ -67,16 +67,18 @@ function printTicket() {
         cancelButtonColor: '#d33',
         confirmButtonText: 'Let\'s go'
     }).then((result) => {
-            const anchor = document.createElement('a');
-            anchor.href = `http://cureco.com/dashboard/receiptPdf`;
-            document.body.appendChild(anchor);
-            anchor.click();
-            document.body.removeChild(anchor);
-            Swal.fire(
-                'are you excited?',
-                'collect your things now and join us on the cruise !',
-                'success'
-            )
+            if (result.isConfirmed) {
+                const anchor = document.createElement('a');
+                anchor.href = `http://cureco.com/dashboard/receiptPdf`;
+                document.body.appendChild(anchor);
+                anchor.click();
+                document.body.removeChild(anchor);
+                Swal.fire(
+                    'are you excited?',
+                    'collect your things now and join us on the cruise !',
+                    'success'
+                )
+            }
         }
     )
 }

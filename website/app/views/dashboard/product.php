@@ -8,26 +8,29 @@
             <div class="col-12">
                 <div class="card mb-4">
                     <div class="card-header pb-2">
-                        <div class="d-flex justify-content-between">
+                        <div class="d-flex flex-wrap justify-content-between float-right">
                             <div>
-                                <h6>Product table</h6>
+                                <h6 class="text-center">Product table</h6>
                             </div>
-                            <div class="d-flex align-items-start justify-content-center">
-                                <h6 class="m-0">Sort By :</h6>
-                                <select class="mx-3 px-1 border-radius-2xl d-flex align-items-center"
-                                        id="sortBy" style="height: 25px;opacity: 70%">
-                                    <option value="libel"> libel</option>
-                                    <option value="qnt"> Quantity</option>
-                                    <option value="price"> price</option>
-                                    <option value="desc"> Description</option>
-                                    <option value="codeBar"> code Bar</option>
-                                    <option value="expirationDate"> expiration Date</option>
-                                    <option value="company"> company</option>
-                                </select>
-                                <div class="opacity-4 cursor-pointer" style="color: var(--blue)" id="sortByDir">
-                                    <i class='bx bx-sort-up bx-sm'></i>
+                            <div class="d-flex flex-wrap align-items-start justify-content-center">
+                                <div>
+                                    <h6 class="m-0">Sort By :</h6>
                                 </div>
-
+                                <div class="d-flex">
+                                    <select class="mx-3 px-1 border-radius-2xl d-flex align-items-center"
+                                            id="sortBy" style="height: 25px;opacity: 70%;">
+                                        <option value="libel"> libel</option>
+                                        <option value="qnt"> Quantity</option>
+                                        <option value="price"> price</option>
+                                        <option value="desc"> Description</option>
+                                        <option value="codeBar"> code Bar</option>
+                                        <option value="expirationDate"> expiration Date</option>
+                                        <option value="company"> company</option>
+                                    </select>
+                                    <div class="opacity-4 cursor-pointer" style="color: var(--blue)" id="sortByDir">
+                                        <i class='bx bx-sort-up bx-sm'></i>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

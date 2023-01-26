@@ -83,7 +83,9 @@ class users extends DB
     {
         return $this->con->rawquery("SELECT " . " * 
                                            FROM 
-                                                {$this->table} 
+                                                {$this->table}
+                                           WHERE
+                                                is_admin != true
                                            ORDER BY id LIMIT 8;");
     }
 }

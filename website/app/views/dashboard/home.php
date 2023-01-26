@@ -90,7 +90,7 @@
                 foreach ($users as $u) : ?>
                     <tr>
                         <td width="60px">
-                            <div class="imgBx"><img src="<?=$u['img']?>" alt=""></div>
+                            <div class="imgBx"><img src='<?=$u['img']?>' alt=""></div>
                         </td>
                         <td>
                             <h4> <?=$u['firstName']?> <?=$u['lastName']?><br> <span> <?=$u['email']?> </span></h4>

@@ -22,8 +22,8 @@ class DashboardController
     public function index(): void
     {
         $data = [];
-        $products = new product();
         $users = new users();
+        $products = new product();
         $data['products'] = $products->getRecent();
         $data['users'] = $users->getRecent();
         $data['total'] = $products->getTotal();
@@ -35,9 +35,9 @@ class DashboardController
             $f = finfo_open();
             $mime_type = finfo_buffer($f, $imgdata, FILEINFO_MIME_TYPE);
             if ($mime_type != 'text/plain') {
-                $data['users'][$i]['img'] = "data:{$mime_type};charset=utf8;base64," . base64_encode($data['users'][$i]['img']) . '"';
+                $data['users'][$i]['img'] = "data:{$mime_type};charset=utf8;base64," . base64_encode($data['users'][$i]['img']);
             } else {
-                $data['users'][$i]['img'] = "data:image/svg+xml;utf8," . addslashes(htmlentities(base64_decode($data['users'][$i]['img']))) . '"';
+                $data['users'][$i]['img'] = "data:image/svg+xml;utf8," . addslashes(htmlentities(base64_decode($data['users'][$i]['img'])));
             }
         }
         View::load('dashboard/home', $data);
@@ -58,17 +58,33 @@ class DashboardController
     public function addCategory(): void
     {
         $category = new category();
+        $history = new History();
         if (isset($_POST['submitBtn'])) {
+            $flag = true;
             extract($_POST);
             for ($i = 0; $i < count($_POST['productType']); $i++) {
                 $data = array(
                     'libel' => $_POST['productType'][$i],
                     'desc' => $_POST['desc'][$i]
                 );
-                $category->insert($data);
+                if ($category->insert($data)) {
+                    $data = array(
+                        'users' => $_SESSION['user']['id_u'],
+                        'item' => $_POST['productType'][$i],
+                        'action' => 'Add',
+                        'role' => 'category'
+                    );
+                    $history->insert($data);
+                } else {
+                    $flag = false;
+                }
             }
-            notif::add('product Type added successfully', 'success');
-            redirect('dashboard');
+            if ($flag) {
+                notif::add('Category added successfully');
+            } else {
+                notif::add('Something wrong went !', 'error');
+            }
+            redirect('dashboard/addcategory');
             exit();
         }
         view::load('dashboard/addCategory');
@@ -80,6 +96,7 @@ class DashboardController
     public function editCategory($id = 0): void
     {
         $data = [];
+        $history = new history();
         $typeProduct = new category();
         if (isset($_POST['submit'])) {
             extract($_POST);
@@ -88,7 +105,14 @@ class DashboardController
                 'desc' => $_POST['desc']
             );
             if ($typeProduct->update($id, $data)) {
-                notif::add('category edited successfully', 'success');
+                $data = array(
+                    'users' => $_SESSION['user']['id_u'],
+                    'item' => $_POST['category'],
+                    'action' => 'Edit',
+                    'role' => 'category'
+                );
+                $history->insert($data);
+                notif::add('category edited successfully');
             } else {
                 notif::add('error in edit category', 'error');
             }
@@ -109,10 +133,19 @@ class DashboardController
     #[NoReturn] public function deletCategory($id): void
     {
         $category = new category();
+        $history = new History();
+        $tmp = $category->getRow($id)['libel'];
         if ($category->delete($id)) {
+            $data = array(
+                'users' => $_SESSION['user']['id_u'],
+                'item' => $tmp,
+                'action' => 'Delet',
+                'role' => 'category'
+            );
+            $history->insert($data);
             notif::add('category deleted successfully');
         } else {
-            notif::add('error in deleted category', 'error');
+            notif::add('error in delete category', 'error');
         }
         redirect('dashboard');
         exit();
@@ -140,9 +173,9 @@ class DashboardController
     {
         $data = [];
         $product = new product();
+        $history = new history();
         if (isset($_POST['Libel'])) {
             $flag = true;
-//            debug($_POST);
             extract($_POST);
             for ($i = 0; $i < count($_POST['Libel']); $i++) {
                 $data = array(
@@ -156,7 +189,17 @@ class DashboardController
                     'expirationDate' => validateData::validate_data($_POST['expirationDate'][$i]),
                     'company' => validateData::validate_data($_POST['company'][$i])
                 );
-                if (!$product->insert($data)) $flag = false;
+                if ($product->insert($data)) {
+                    $data = array(
+                        'item' => validateData::validate_data($_POST['Libel'][$i]),
+                        'users' => $_SESSION['user']['id_u'],
+                        'action' => 'Add',
+                        'role' => 'product'
+                    );
+                    $history->insert($data);
+                } else {
+                    $flag = false;
+                }
             }
             if ($flag) {
                 notif::add('product added successfully', 'success');
@@ -179,6 +222,7 @@ class DashboardController
     {
         $data = [];
         $product = new product();
+        $history = new History();
         if (isset($_POST['Libel'])) {
             extract($_POST);
             $data = array(
@@ -193,6 +237,13 @@ class DashboardController
             );
             if (!empty($_FILES['image']['tmp_name'])) $data = array_merge($data, ['img' => file_get_contents($_FILES['image']['tmp_name'])]);
             if ($product->update($id, $data)) {
+                $data = array(
+                    'item' => validateData::validate_data($_POST['Libel']),
+                    'users' => $_SESSION['user']['id_u'],
+                    'action' => 'Edit',
+                    'role' => 'product'
+                );
+                $history->insert($data);
                 notif::add('product edited successfully', 'success');
             } else {
                 notif::add('error in edit product', 'error');
@@ -214,7 +265,16 @@ class DashboardController
     #[NoReturn] public function deletproduct($id): void
     {
         $product = new product();
+        $history = new History();
+        $tmp = $product->getRow($id)['libel'];
         if ($product->delete($id)) {
+            $data = array(
+                'users' => $_SESSION['user']['id_u'],
+                'item' => $tmp,
+                'action' => 'Delet',
+                'role' => 'product'
+            );
+            $history->insert($data);
             notif::add('product deleted successfully');
         } else {
             notif::add('error in deleted product', 'error');
@@ -222,6 +282,7 @@ class DashboardController
         redirect('dashboard/product');
         exit();
     }
+
 
     /**
      * @throws Exception|\Exception
@@ -239,12 +300,12 @@ class DashboardController
             header('Content-Type: application/json');
             echo json_encode($data);
         } else {
-//            rederict 404
+            redirect('404');
         }
     }
 
     /**
-     * @throws Exception
+     * @throws Exception|\Exception
      */
     public function search(): void
     {
@@ -260,7 +321,7 @@ class DashboardController
             header('Content-Type: application/json');
             echo json_encode($data);
         } else {
-//            rederict 404
+            redirect('404');
         }
     }
 
@@ -285,9 +346,11 @@ class DashboardController
     /**
      * @throws Exception|\Exception
      */
-    #[NoReturn] public function editUsers($id)
+    #[NoReturn] public function editUsers($id): void
     {
+        $flag = true;
         $users = new users();
+        $history = new history();
         if ($users->getRow($id)['is_admin']) {
             if ($users->setClient($id)) {
                 notif::add('user edited successfully');
@@ -296,14 +359,25 @@ class DashboardController
                     $log->index();
                 }
             } else {
+                $flag = false;
                 notif::add('error in edited user', 'error');
             }
         } else {
             if ($users->setAdmin($id)) {
                 notif::add('user edited successfully');
             } else {
+                $flag = false;
                 notif::add('error in edited user', 'error');
             }
+        }
+        if ($flag) {
+            $data = array(
+                'item' => $users->getRow($id)['firstName'] . ' ' . $users->getRow($id)['lastName'],
+                'users' => $_SESSION['user']['id_u'],
+                'action' => 'Edit',
+                'role' => 'user'
+            );
+            $history->insert($data);
         }
         redirect('dashboard/users');
         exit();
@@ -315,7 +389,15 @@ class DashboardController
     #[NoReturn] public function deletUser($id): void
     {
         $users = new users();
+        $history = new history();
         if ($users->delete($id)) {
+            $data = array(
+                'item' => $users->getRow($id)['firstName'] . ' ' . $users->getRow($id)['lastName'],
+                'users' => $_SESSION['user']['id_u'],
+                'action' => 'Delete',
+                'role' => 'user'
+            );
+            $history->insert($data);
             notif::add('product deleted successfully');
         } else {
             notif::add('error in deleted product', 'error');
@@ -323,6 +405,7 @@ class DashboardController
         redirect('dashboard/users');
         exit();
     }
+
 
     public function help(): void
     {
@@ -467,5 +550,76 @@ class DashboardController
         HTML;
         $mpdf->WriteHTML($received, \Mpdf\HTMLParserMode::HTML_BODY);
         $mpdf->Output('product.pdf', 'D');
+    }
+
+    /**
+     * @throws Exception|\Exception
+     */
+    public function history(): void
+    {
+        $history = new history();
+        $data['history'] = $history->getAllHistory();
+        for ($i = 0; $i < count($data['history']); $i++) {
+            $imgdata = $data['history'][$i]['img'];
+            $f = finfo_open();
+            $mime_type = finfo_buffer($f, $imgdata, FILEINFO_MIME_TYPE);
+            if ($mime_type != 'text/plain') {
+                $data['history'][$i]['img'] = "data:{$mime_type};charset=utf8;base64," . base64_encode($data['history'][$i]['img']) . '"';
+            } else {
+                $data['history'][$i]['img'] = "data:image/svg+xml;utf8," . addslashes(htmlentities(base64_decode($data['history'][$i]['img']))) . '"';
+            }
+        }
+        View::load('dashboard/history', $data);
+    }
+
+    /**
+     * @throws Exception|\Exception
+     */
+    public function sortHistory($by, $order): void
+    {
+        if ($_POST['send']) {
+            $history = new History();
+            $data = $history->SortBy($by, $order, $_POST['value']);
+            for ($i = 0; $i < count($data); $i++) {
+                $imgdata = $data[$i]['img'];
+                $f = finfo_open();
+                $mime_type = finfo_buffer($f, $imgdata, FILEINFO_MIME_TYPE);
+                if ($mime_type != 'text/plain') {
+                    $data[$i]['img'] = "data:{$mime_type};charset=utf8;base64," . base64_encode($data[$i]['img']) . '"';
+                } else {
+                    $data[$i]['img'] = "data:image/svg+xml;utf8," . addslashes(htmlentities(base64_decode($data[$i]['img']))) . '"';
+                }
+            }
+            header('Content-Type: application/json');
+            echo json_encode($data);
+        } else {
+            redirect('404');
+        }
+    }
+
+    /**
+     * @throws Exception|\Exception
+     */
+    public function searchHistory(): void
+    {
+        if ($_POST['send']) {
+            $key = $_POST['value'];
+            $history = new History();
+            $data = $history->search($key);
+            for ($i = 0; $i < count($data); $i++) {
+                $imgdata = $data[$i]['img'];
+                $f = finfo_open();
+                $mime_type = finfo_buffer($f, $imgdata, FILEINFO_MIME_TYPE);
+                if ($mime_type != 'text/plain') {
+                    $data[$i]['img'] = "data:{$mime_type};charset=utf8;base64," . base64_encode($data[$i]['img']) . '"';
+                } else {
+                    $data[$i]['img'] = "data:image/svg+xml;utf8," . addslashes(htmlentities(base64_decode($data[$i]['img']))) . '"';
+                }
+            }
+            header('Content-Type: application/json');
+            echo json_encode($data);
+        } else {
+            redirect('404');
+        }
     }
 }

@@ -10,54 +10,32 @@ document.getElementById('sortBy').addEventListener('change', () => {
 
 function HtmlSetter(data){
     return `
-    <td>
-        <div class="d-flex px-2 py-1">
-            <div>
-                <img src="${data.img}"
-                     class="avatar avatar-sm me-3" alt="user1"
-                     style="position: relative;">
+    <tr>
+        <td>
+            <div class="d-flex px-2 py-1">
+                <div>
+                    <img src="${data.img}"
+                         class="avatar avatar-sm me-3" alt="user1"
+                         style="position: relative;">
+                </div>
+                <div class="d-flex flex-column justify-content-center">
+                    <h6 class="mb-0 text-sm">${data.NAME}</h6>
+                </div>
             </div>
-            <div class="d-flex flex-column justify-content-center">
-                <h6 class="mb-0 text-sm">${data.libel}</h6>
-            </div>
-        </div>
-    </td>
-    <td>
-        <p class="text-xs font-weight-bold mb-0 text-center">${data.category}</p>
-    </td>
-    <td>
-        <p class="text-xs font-weight-bold mb-0 text-center">${data.qnt}</p>
-    </td>
-    <td>
-        <p class="text-xs font-weight-bold text-center mb-1"
-           style="min-width: 100px;max-width: 150px">${data.price}</p>
-    </td>
-    <td>
-        <p class="text-xs font-weight-bold text-center mb-1 text-truncate"
-           style="min-width: 100px;max-width: 150px">${data.desc}</p>
-    </td>
-    <td>
-        <p class="text-xs font-weight-bold mb-0 text-center">${data.codeBar}</p>
-    </td>
-    <td>
-        <p class="text-xs font-weight-bold mb-0 text-center mb-1">${data.expirationDate}</p>
-    </td>
-    <td>
-        <p class="text-xs text-secondary text-center mb-0">${data.company}</p>
-    </td>
-    <td class="align-middle">
-        <a href="http://cureco.com/dashboard/editproduct/${data.id}"
-           class="text-secondary font-weight-bold text-xs">
-            Edit
-        </a>
-    </td>
-    <td class="align-middle">
-        <a onclick="deletItem('http://cureco.com/dashboard/deletproduct/${data.id}')"
-           class="text-secondary font-weight-bold text-xs cursor-pointer"
-           data-toggle="tooltip" data-original-title="Edit user">
-            Delete
-        </a>
-    </td>`;
+        </td>
+        <td>
+            <p class="text-xs font-weight-bold mb-0 text-center">${data.action}</p>
+        </td>
+        <td>
+            <p class="text-xs font-weight-bold mb-0 text-center">${data.role}</p>
+        </td>
+        <td>
+            <p class="text-xs font-weight-bold mb-0 text-center">${data.item}</p>
+        </td>
+        <td>
+            <p class="text-xs font-weight-bold text-center mb-1">${data.date}</p>
+        </td>
+    </tr>`;
 }
 function SortProduct() {
     const sortingBy = document.getElementById('sortBy').value;
@@ -67,7 +45,7 @@ function SortProduct() {
     $.ajax(
         {
             type: "POST",
-            url: `http://cureco.com/dashboard/Sortproduct/${sortingBy}/${sortingDir}`,
+            url: `http://cureco.com/dashboard/sortHistory/${sortingBy}/${sortingDir}`,
             data: {
                 send: true,
                 value : searchValue
@@ -92,7 +70,7 @@ $('#seachBox')?.on("change keyup paste", function (e) {
     $.ajax(
         {
             type: "POST",
-            url: `http://cureco.com/dashboard/search/`,
+            url: `http://cureco.com/dashboard/searchHistory/`,
             data: {
                 send: true,
                 value: value

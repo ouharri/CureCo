@@ -99,11 +99,20 @@
             </div>
 
             <li id="Customers">
-                <a href="<?=url('dashboard/users')?>">
+                <a href="<?= url('dashboard/users') ?>">
                         <span class="icon">
                             <ion-icon name="people-outline"></ion-icon>
                         </span>
                     <span class="title">Users</span>
+                </a>
+            </li>
+
+            <li id="history">
+                <a href="<?= url('dashboard/history') ?>">
+                        <span class="icon">
+                            <ion-icon name="stopwatch-outline"></ion-icon>
+                        </span>
+                    <span class="title">history</span>
                 </a>
             </li>
 
@@ -117,7 +126,7 @@
             </li>
 
             <li>
-                <a href="<?=url('dashboard/help')?>">
+                <a href="<?= url('dashboard/help') ?>">
                         <span class="icon">
                             <ion-icon name="help-outline"></ion-icon>
                         </span>
@@ -125,26 +134,26 @@
                 </a>
             </li>
 
-<!--            <li>-->
-<!--                <a href="#">-->
-<!--                        <span class="icon">-->
-<!--                            <ion-icon name="settings-outline"></ion-icon>-->
-<!--                        </span>-->
-<!--                    <span class="title">Settings</span>-->
-<!--                </a>-->
-<!--            </li>-->
+            <!--            <li>-->
+            <!--                <a href="#">-->
+            <!--                        <span class="icon">-->
+            <!--                            <ion-icon name="settings-outline"></ion-icon>-->
+            <!--                        </span>-->
+            <!--                    <span class="title">Settings</span>-->
+            <!--                </a>-->
+            <!--            </li>-->
 
-<!--            <li>-->
-<!--                <a href="#">-->
-<!--                        <span class="icon">-->
-<!--                            <ion-icon name="lock-closed-outline"></ion-icon>-->
-<!--                        </span>-->
-<!--                    <span class="title">Password</span>-->
-<!--                </a>-->
-<!--            </li>-->
+            <!--            <li>-->
+            <!--                <a href="#">-->
+            <!--                        <span class="icon">-->
+            <!--                            <ion-icon name="lock-closed-outline"></ion-icon>-->
+            <!--                        </span>-->
+            <!--                    <span class="title">Password</span>-->
+            <!--                </a>-->
+            <!--            </li>-->
 
             <li>
-                <a href="<?=url('logout')?>">
+                <a href="<?= url('logout') ?>">
                         <span class="icon">
                             <ion-icon name="log-out-outline"></ion-icon>
                         </span>

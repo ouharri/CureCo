@@ -12,8 +12,6 @@ class product extends DB
 
     public function SortBy($by, $order, $key)
     {
-        $this->table = 'products';
-        $this->connect();
         return $this->con->rawquery("SELECT " . "
                                         *
                                     FROM
@@ -21,7 +19,7 @@ class product extends DB
                                     where 
                                         libel LIKE '%{$key}%'
                                     ORDER BY
-                                        $by $order;");
+                                        `{$by}` {$order};");
     }
 
     /**

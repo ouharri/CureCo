@@ -17,7 +17,6 @@
 
 <script src="https://kit.fontawesome.com/3d582d9974.js" crossorigin="anonymous"></script>
 
-
 <script src="https://kit.fontawesome.com/af562a2a63.js" crossorigin="anonymous"></script>
 
 <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">

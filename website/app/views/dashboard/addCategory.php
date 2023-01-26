@@ -1,5 +1,4 @@
 <?php include_once VIEWS . 'component' . DS . 'admin' . DS . 'header.php'; ?>
-<!--<link rel="stylesheet" href="--><?php //= url('css/connection.css?v=') . time() ?><!--" type="text/css" media="all"/>-->
 
 <div class="d-flex flex-column justify-content-center align-content-center"
      style="min-height: calc(100vh - 60px );">
