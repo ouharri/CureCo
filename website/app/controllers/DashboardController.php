@@ -43,6 +43,11 @@ class DashboardController
         View::load('dashboard/home', $data);
     }
 
+    public function P404(): void
+    {
+        View::load('dashboard/P404');
+    }
+
     /**
      */
     public function category(): void
@@ -147,7 +152,7 @@ class DashboardController
         } else {
             notif::add('error in delete category', 'error');
         }
-        redirect('dashboard');
+        redirect('dashboard/category');
         exit();
     }
 
@@ -251,10 +256,15 @@ class DashboardController
             redirect('dashboard/product');
             exit();
         } else if ($id != 0) {
-            $category = new category();
-            $data['category'] = $category->getAll();
-            $data['product'] = $product->getRow($id);
-            $data['product']['category'] = $category->getRow($data['product']['category'])['libel'];
+            if ($product->getRow($id)) {
+                $category = new category();
+                $data['category'] = $category->getAll();
+                $data['product'] = $product->getRow($id);
+                $data['product']['category'] = $category->getRow($data['product']['category'])['libel'];
+            } else {
+                redirect('dashboard/P404');
+                exit();
+            }
         }
         view::load('dashboard/editProduct', $data);
     }
@@ -300,7 +310,7 @@ class DashboardController
             header('Content-Type: application/json');
             echo json_encode($data);
         } else {
-            redirect('404');
+            redirect('dashboard/P404');
         }
     }
 
@@ -351,36 +361,40 @@ class DashboardController
         $flag = true;
         $users = new users();
         $history = new history();
-        if ($users->getRow($id)['is_admin']) {
-            if ($users->setClient($id)) {
-                notif::add('user edited successfully');
-                if ($id == $_SESSION['user']['id_u']) {
-                    $log = new logoutController();
-                    $log->index();
+        if ($users->getRow($id)) {
+            if ($users->getRow($id)['is_admin']) {
+                if ($users->setClient($id)) {
+                    notif::add('user edited successfully');
+                    if ($id == $_SESSION['user']['id_u']) {
+                        $log = new logoutController();
+                        $log->index();
+                    }
+                } else {
+                    $flag = false;
+                    notif::add('error in edited user', 'error');
                 }
             } else {
-                $flag = false;
-                notif::add('error in edited user', 'error');
+                if ($users->setAdmin($id)) {
+                    notif::add('user edited successfully');
+                } else {
+                    $flag = false;
+                    notif::add('error in edited user', 'error');
+                }
+            }
+            if ($flag) {
+                $data = array(
+                    'item' => $users->getRow($id)['firstName'] . ' ' . $users->getRow($id)['lastName'],
+                    'users' => $_SESSION['user']['id_u'],
+                    'action' => 'Edit',
+                    'role' => 'user'
+                );
+                $history->insert($data);
             }
         } else {
-            if ($users->setAdmin($id)) {
-                notif::add('user edited successfully');
-            } else {
-                $flag = false;
-                notif::add('error in edited user', 'error');
-            }
-        }
-        if ($flag) {
-            $data = array(
-                'item' => $users->getRow($id)['firstName'] . ' ' . $users->getRow($id)['lastName'],
-                'users' => $_SESSION['user']['id_u'],
-                'action' => 'Edit',
-                'role' => 'user'
-            );
-            $history->insert($data);
+            redirect('dashboard/P404');
+            exit();
         }
         redirect('dashboard/users');
-        exit();
     }
 
     /**
@@ -390,20 +404,24 @@ class DashboardController
     {
         $users = new users();
         $history = new history();
-        if ($users->delete($id)) {
-            $data = array(
-                'item' => $users->getRow($id)['firstName'] . ' ' . $users->getRow($id)['lastName'],
-                'users' => $_SESSION['user']['id_u'],
-                'action' => 'Delete',
-                'role' => 'user'
-            );
-            $history->insert($data);
-            notif::add('product deleted successfully');
+        if ($users->getRow($id)) {
+            if ($users->delete($id)) {
+                $data = array(
+                    'item' => $users->getRow($id)['firstName'] . ' ' . $users->getRow($id)['lastName'],
+                    'users' => $_SESSION['user']['id_u'],
+                    'action' => 'Delete',
+                    'role' => 'user'
+                );
+                $history->insert($data);
+                notif::add('product deleted successfully');
+            } else {
+                notif::add('error in deleted product', 'error');
+            }
         } else {
-            notif::add('error in deleted product', 'error');
+            redirect('dashboard/P404');
+            exit();
         }
         redirect('dashboard/users');
-        exit();
     }
 
 
@@ -575,7 +593,7 @@ class DashboardController
     /**
      * @throws Exception|\Exception
      */
-    public function sortHistory($by, $order): void
+    public function sortHistory($by = '', $order = ''): void
     {
         if ($_POST['send']) {
             $history = new History();
@@ -593,7 +611,7 @@ class DashboardController
             header('Content-Type: application/json');
             echo json_encode($data);
         } else {
-            redirect('404');
+            redirect('dashboard/P404');
         }
     }
 
@@ -619,7 +637,12 @@ class DashboardController
             header('Content-Type: application/json');
             echo json_encode($data);
         } else {
-            redirect('404');
+            redirect('dashboard/P404');
         }
+    }
+
+    public function __destruct()
+    {
+        redirect::admin();
     }
 }

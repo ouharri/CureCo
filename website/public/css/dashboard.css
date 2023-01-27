@@ -442,7 +442,7 @@ body::-webkit-scrollbar-thumb {
 .cardBox .card {
     position: relative;
     background: var(--white);
-    padding: 30px;
+    padding: 18px;
     border-radius: 20px;
     display: flex;
     justify-content: space-between;

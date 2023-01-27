@@ -74,7 +74,6 @@ function SortProduct() {
             },
             datatype: "json",
             success: function (data) {
-                console.log(data)
                 const productTable = document.getElementById('tbodyProduct');
                 productTable.innerHTML = "";
                 for (let i = 0; i < data.length; i++) {
