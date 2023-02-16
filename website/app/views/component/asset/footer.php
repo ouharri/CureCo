@@ -1,6 +1,6 @@
 <!-- JavaScript -->
 
-<script src="<?= url('js/plugins/jquery-3.4.1.min.js.js') . '?v=' . time() ?>"></script>
+<script src="<?= url('js/plugins/jquery-3.4.1.min.js') . '?v=' . time() ?>"></script>
 
 <script src="<?= url('js/plugins/bootstrap.bundle.min.js') . '?v=' . time() ?>"></script>
 <!-- Swiper JS -->

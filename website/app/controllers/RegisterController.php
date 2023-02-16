@@ -41,12 +41,12 @@ class registerController
                                 //Server settings
                                 $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
                                 $mail->isSMTP();                                            //Send using SMTP
-                                $mail->Host = 'smtp.gmail.com';                     //Set the SMTP server to send through
+                                $mail->Host = $_ENV['MAIL_HOST'];                     //Set the SMTP server to send through
                                 $mail->SMTPAuth = true;                                   //Enable SMTP authentication
-                                $mail->Username = 'atman.atharri@gmail.com';                     //SMTP username
-                                $mail->Password = 'jbpdcdxbpzmsfmzn';                               //SMTP password
+                                $mail->Username = $_ENV['MAIL_USERNAME'];                     //SMTP username
+                                $mail->Password = $_ENV['MAIL_PASSWORD'];                               //SMTP password
                                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
-                                $mail->Port = 465;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+                                $mail->Port = $_ENV['MAIL_PORT'];                                   //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
                                 //Recipients
                                 $mail->setFrom('atman.atharri@gmail.com');
                                 $mail->addAddress($email);
@@ -62,10 +62,9 @@ class registerController
                             }
                         }
                         echo "</div>";
-                        if ($flag){
+                        if ($flag) {
                             $data['msg'] = "<div class='alert alert-info'>We've send a verification link on your email address.</div>";
-                        }
-                        else{
+                        } else {
                             $data['msg'] = "<div class='alert alert-danger'>We Dont send a verification link ! (Something wrong went).</div>";
                         }
                     } else {

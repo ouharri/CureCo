@@ -1,0 +1,19 @@
+parameters:
+	level: 5
+	paths:
+		- src
+		#- tests
+
+	ignoreErrors:
+		-
+			message: "#^Method setasign\\\\Fpdi\\\\Fpdi\\:\\:getPdfParserInstance\\(\\) has invalid return type setasign\\\\FpdiPdfParser\\\\PdfParser\\\\PdfParser\\.$#"
+			count: 1
+			path: src/Fpdi.php
+		-
+			message: "#^Method setasign\\\\Fpdi\\\\Tcpdf\\\\Fpdi\\:\\:getPdfParserInstance\\(\\) has invalid return type setasign\\\\FpdiPdfParser\\\\PdfParser\\\\PdfParser\\.$#"
+			count: 1
+			path: src/Tcpdf/Fpdi.php
+		-
+			message: "#^Method setasign\\\\Fpdi\\\\Tfpdf\\\\Fpdi\\:\\:getPdfParserInstance\\(\\) has invalid return type setasign\\\\FpdiPdfParser\\\\PdfParser\\\\PdfParser\\.$#"
+			count: 1
+			path: src/Tfpdf/Fpdi.php
