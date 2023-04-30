@@ -7,6 +7,8 @@ The mission will be supervised by your CureCo product owner.
 
 ​
 
+![img.png](website/public/images/readme/img.png)
+
 Instructions :
 
 ​
@@ -33,6 +35,8 @@ Field validation with the JavaScript language.
 
 ​
 
+![img_1.png](website/public/images/readme/img_1.png)
+
 Required work :
 
 ​
@@ -48,3 +52,5 @@ Implementation of statistics.
 Implementation of the Login system/Admin Dashboard.
 Have at least two tables.
 Implementation of multiple data insertion (two insertions, dynamic form).
+
+![img_2.png](website/public/images/readme/img_2.png)
